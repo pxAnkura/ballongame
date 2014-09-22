@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>TitleEvents</name>
+    <events>
+        <variable constant="0" name="prog" sid="8775533645986018" static="0" type="number">0</variable>
+        <event-block sid="4463219042091077">
+            <conditions>
+                <condition id="-2" name="On start of layout" sid="3152416449617038" type="System" />
+            </conditions>
+            <actions>
+                <action id="-9" name="Set value" sid="8920550012931722" type="System">
+                    <param id="0" name="Variable">startTime</param>
+                    <param id="1" name="Value">time</param>
+                </action>
+                <action id="-4" name="Set layer visible" sid="8327944781713038" type="System">
+                    <param id="0" name="Layer">1</param>
+                    <param id="1" name="Visibility">0</param>
+                </action>
+                <action id="-10" name="Set value" sid="9882706814076811" type="ScirraLetter">
+                    <param id="0" name="Instance variable">sx</param>
+                    <param id="1" name="Value">150</param>
+                </action>
+                <action id="-10" name="Set value" sid="6130941010795491" type="ScirraLetter">
+                    <param id="0" name="Instance variable">sy</param>
+                    <param id="1" name="Value">240</param>
+                </action>
+                <action id="-10" name="Set value" sid="8011978067864705" type="ScirraLetter">
+                    <param id="0" name="Instance variable">ia</param>
+                    <param id="1" name="Value">angle(self.sx, self.sy, self.X, self.Y)</param>
+                </action>
+                <action id="-10" name="Set value" sid="1616735799608803" type="ScirraLetter">
+                    <param id="0" name="Instance variable">dist</param>
+                    <param id="1" name="Value">distance(self.sx, self.sy, self.X, self.Y)</param>
+                </action>
+                <action id="-10" name="Set value" sid="8086192370980382" type="ScirraLetter">
+                    <param id="0" name="Instance variable">da</param>
+                    <param id="1" name="Value">random(-20, 20)</param>
+                </action>
+                <action id="5" name="Set web font" sid="6503144564466863" type="DummyText">
+                    <param id="0" name="Family name">&quot;Revalia&quot;</param>
+                    <param id="1" name="CSS URL">&quot;http://fonts.googleapis.com/css?family=Revalia&quot;</param>
+                </action>
+                <action id="0" name="Set cursor style" sid="5682221920483892" type="Mouse">
+                    <param id="0" name="Cursor style">0</param>
+                </action>
+            </actions>
+        </event-block>
+        <comment>Running Scirra logo animation</comment>
+        <event-block sid="9144244103049748">
+            <conditions>
+                <condition id="-7" name="Compare time" sid="9025731240011548" type="System">
+                    <param id="0" name="Comparison">2</param>
+                    <param id="1" name="Time (seconds)">startTime + 2</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-9" name="Set value" sid="2738453380720862" type="System">
+                    <param id="0" name="Variable">prog</param>
+                    <param id="1" name="Value">sin(((time - startTime) / 4) * 180) / 2</param>
+                </action>
+                <action id="-3" name="Set position" sid="4536871647935275" type="ScirraLetter">
+                    <param id="0" name="X">Self.sx</param>
+                    <param id="1" name="Y">self.sy</param>
+                </action>
+                <action id="-8" name="Set angle" sid="6908640946062408" type="ScirraLetter">
+                    <param id="0" name="Angle">lerp(self.da, -self.da, prog)</param>
+                </action>
+                <action id="-23" name="Move at angle" sid="2685584444712041" type="ScirraLetter">
+                    <param id="0" name="Angle">self.ia + lerp(self.da, -self.da, prog)</param>
+                    <param id="1" name="Distance">self.dist</param>
+                </action>
+                <action id="-16" name="Set opacity" sid="2633683120316528" type="ScirraLetter">
+                    <param id="0" name="Opacity">prog * 200</param>
+                </action>
+            </actions>
+        </event-block>
+        <comment>Showing Construct 2 logo</comment>
+        <event-block sid="6074282684043481">
+            <conditions>
+                <condition id="-7" name="Compare time" sid="2013538036868497" type="System">
+                    <param id="0" name="Comparison">5</param>
+                    <param id="1" name="Time (seconds)">startTime + 3.75</param>
+                </condition>
+                <condition id="-4" name="Trigger once while true" sid="5184452984086539" type="System" />
+            </conditions>
+            <actions>
+                <action behavior="Fade" id="1" name="Start fade" sid="9146765863916252" type="TitleText" />
+                <action id="-15" name="Set visible" sid="3968082183924283" type="TitleText">
+                    <param id="0" name="Visibility">1</param>
+                </action>
+                <action behavior="Fade" id="1" name="Start fade" sid="745029196026168" type="Construct2Logo" />
+                <action id="-15" name="Set visible" sid="566185970878683" type="Construct2Logo">
+                    <param id="0" name="Visibility">1</param>
+                </action>
+            </actions>
+        </event-block>
+        <comment>Fade to black</comment>
+        <event-block sid="8852610741079868">
+            <conditions>
+                <condition id="-7" name="Compare time" sid="6921606664432274" type="System">
+                    <param id="0" name="Comparison">4</param>
+                    <param id="1" name="Time (seconds)">startTime + 6.25</param>
+                </condition>
+            </conditions>
+            <actions>
+                <action id="-4" name="Set layer visible" sid="2652196016357029" type="System">
+                    <param id="0" name="Layer">1</param>
+                    <param id="1" name="Visibility">1</param>
+                </action>
+                <action id="-18" name="Set layer opacity" sid="3215984548034296" type="System">
+                    <param id="0" name="Layer">1</param>
+                    <param id="1" name="Opacity">lerp(0, 100, ((time - startTime) - 6.25) / 2)</param>
+                </action>
+            </actions>
+        </event-block>
+        <event-block sid="1384689070705931">
+            <conditions>
+                <condition id="-7" name="Compare time" sid="1613698589134071" type="System">
+                    <param id="0" name="Comparison">5</param>
+                    <param id="1" name="Time (seconds)">startTime + 8.25</param>
+                </condition>
+                <condition id="-4" name="Trigger once while true" sid="9231069618042081" type="System" />
+            </conditions>
+            <actions>
+                <action id="-2" name="Go to layout" sid="3541413804235577" type="System">
+                    <param id="0" name="Layout">Game</param>
+                </action>
+            </actions>
+        </event-block>
+    </events>
+</c2eventsheet>

@@ -1,0 +1,1029 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<c2eventsheet>
+    <!--All the 'name' attributes are ignored by Construct 2 - they are there for readability only.-->
+    <name>GameEvents</name>
+    <events>
+        <variable comment="1 if lightning is showing" constant="0" name="isLightning" sid="4131779744124563" static="0" type="number">0</variable>
+        <variable comment="Time at the start of the layout" constant="0" name="startTime" sid="6288087330141776" static="0" type="number">0</variable>
+        <variable comment="Number of monsters &apos;expunged&apos;" constant="0" name="kills" sid="2177414287689023" static="0" type="number">0</variable>
+        <variable comment="Player health" constant="0" name="health" sid="1581567481715134" static="0" type="number">100</variable>
+        <variable comment="Angle for the swirl effect on death." constant="0" name="swirlangle" sid="1179470317761182" static="0" type="number">0</variable>
+        <variable comment="1 if fading out after death." constant="0" name="fadingout" sid="8837940047751636" static="0" type="number">0</variable>
+        <event-group description="Start of layout and every tick updates." sid="6236239194216044" title="General control">
+            <sub-events>
+                <comment>Start of layout initialisation.  Pinning objects, set cursor, set up the rain loop, load the web font, disable the layout effects, and set the layer transitions.</comment>
+                <event-block sid="4979399111154638">
+                    <conditions>
+                        <condition id="-2" name="On start of layout" sid="8650719933410554" type="System" />
+                    </conditions>
+                    <actions>
+                        <action behavior="Pin" id="0" name="Pin to object" sid="9565994382107217" type="PlayerGun">
+                            <param id="0" name="Pin to">Player</param>
+                            <param id="1" name="Mode">0</param>
+                        </action>
+                        <action behavior="Pin" id="0" name="Pin to object" sid="6522298125823087" type="PlayerReflection">
+                            <param id="0" name="Pin to">Player</param>
+                            <param id="1" name="Mode">0</param>
+                        </action>
+                        <action id="1" name="Set cursor from sprite" sid="4600111827723143" type="Mouse">
+                            <param id="0" name="Sprite">MouseImage</param>
+                        </action>
+                        <action id="0" name="Play" sid="1610321143902734" type="Audio">
+                            <param id="0" name="Audio file">rain_loop</param>
+                            <param id="2" name="Loop">1</param>
+                            <param id="3" name="Volume">-30</param>
+                            <param id="1" name="Tag (optional)">&quot;rain&quot;</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="5289162306794363" type="System">
+                            <param id="0" name="Variable">startTime</param>
+                            <param id="1" name="Value">time</param>
+                        </action>
+                        <action id="5" name="Set web font" sid="7194088188947198" type="KillsText">
+                            <param id="0" name="Family name">&quot;Revalia&quot;</param>
+                            <param id="1" name="CSS URL">&quot;http://fonts.googleapis.com/css?family=Revalia&quot;</param>
+                        </action>
+                        <action id="5" name="Set web font" sid="6959067960381109" type="HealthText">
+                            <param id="0" name="Family name">&quot;Revalia&quot;</param>
+                            <param id="1" name="CSS URL">&quot;http://fonts.googleapis.com/css?family=Revalia&quot;</param>
+                        </action>
+                        <action id="-29" name="Set layout effect enabled" sid="9613583164794062" type="System">
+                            <param id="0" name="Mode">0</param>
+                            <param id="1" name="Effect">&quot;RadialBlur&quot;</param>
+                        </action>
+                        <action id="-29" name="Set layout effect enabled" sid="9742915827090007" type="System">
+                            <param id="0" name="Mode">0</param>
+                            <param id="1" name="Effect">&quot;Tint&quot;</param>
+                        </action>
+                        <action id="-29" name="Set layout effect enabled" sid="3905152422378537" type="System">
+                            <param id="0" name="Mode">0</param>
+                            <param id="1" name="Effect">&quot;Swirl&quot;</param>
+                        </action>
+                        <action id="-4" name="Set layer visible" sid="7102828899589405" type="System">
+                            <param id="0" name="Layer">&quot;Transition&quot;</param>
+                            <param id="1" name="Visibility">1</param>
+                        </action>
+                        <action id="-4" name="Set layer visible" sid="6373979589380511" type="System">
+                            <param id="0" name="Layer">&quot;TransitionOut&quot;</param>
+                            <param id="1" name="Visibility">0</param>
+                        </action>
+                        <action id="-18" name="Set layer opacity" sid="5375514635994479" type="System">
+                            <param id="0" name="Layer">&quot;TransitionOut&quot;</param>
+                            <param id="1" name="Opacity">0</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <comment>Show a warning if WebGL is not supported.</comment>
+                        <event-block sid="8996828628097234">
+                            <conditions>
+                                <condition id="-8" name="Compare two values" sid="6166736203424522" type="System">
+                                    <param id="0" name="First value">renderer</param>
+                                    <param id="1" name="Comparison">1</param>
+                                    <param id="2" name="Second value">&quot;webgl&quot;</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Set text" sid="755616523116458" type="StatsText2">
+                                    <param id="0" name="Text">&quot;No webgl support! Shaders not running, try Firefox or Chrome and updating graphics driver&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>Fade in from black and fade in the rain loop sound.</comment>
+                <event-block sid="2398659298063325">
+                    <conditions>
+                        <condition id="-7" name="Compare time" sid="4737090730684911" type="System">
+                            <param id="0" name="Comparison">2</param>
+                            <param id="1" name="Time (seconds)">startTime + 2</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="3" name="Set volume" sid="6101929576938801" type="Audio">
+                            <param id="0" name="Tag">&quot;rain&quot;</param>
+                            <param id="1" name="dB">lerp(-30, -5, (time - startTime) / 2)</param>
+                        </action>
+                        <action id="-18" name="Set layer opacity" sid="8779973697731717" type="System">
+                            <param id="0" name="Layer">&quot;Transition&quot;</param>
+                            <param id="1" name="Opacity">lerp(100, 0, (time - startTime) / 2)</param>
+                        </action>
+                        <action id="-16" name="Set opacity" sid="1906731197284472" type="HealthText">
+                            <param id="0" name="Opacity">(100 - LayerOpacity(&quot;Transition&quot;)) / 2</param>
+                        </action>
+                        <action id="-16" name="Set opacity" sid="7143922150846098" type="KillsText">
+                            <param id="0" name="Opacity">(100 - LayerOpacity(&quot;Transition&quot;)) / 2</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="4789424509107084">
+                    <conditions>
+                        <condition id="-7" name="Compare time" sid="1544515299030999" type="System">
+                            <param id="0" name="Comparison">5</param>
+                            <param id="1" name="Time (seconds)">startTime + 2</param>
+                        </condition>
+                        <condition id="-4" name="Trigger once while true" sid="8938744657098263" type="System" />
+                    </conditions>
+                    <actions>
+                        <action id="3" name="Set volume" sid="1080967462267925" type="Audio">
+                            <param id="0" name="Tag">&quot;rain&quot;</param>
+                            <param id="1" name="dB">-5</param>
+                        </action>
+                        <action id="-4" name="Set layer visible" sid="497351994807625" type="System">
+                            <param id="0" name="Layer">&quot;Transition&quot;</param>
+                            <param id="1" name="Visibility">0</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>Every tick game updates, e.g. UI updates, player looking at the mouse, and updating layer scales.</comment>
+                <event-block sid="1577870722935943">
+                    <conditions>
+                        <condition id="-1" name="Every tick" sid="6597167410423404" type="System" />
+                    </conditions>
+                    <actions>
+                        <action id="0" name="Set text" sid="3507985930715075" type="StatsText1">
+                            <param id="0" name="Text">fps &amp; &quot; FPS - &quot; &amp; objectcount &amp; &quot; objects - &quot; &amp; renderer &amp; &quot; renderer&quot;</param>
+                        </action>
+                        <action id="0" name="Set text" sid="2704412607562169" type="KillsText">
+                            <param id="0" name="Text">kills &amp; &quot; EXPUNGED&quot;</param>
+                        </action>
+                        <action id="0" name="Set text" sid="3462383703755466" type="HealthText">
+                            <param id="0" name="Text">round(max(health, 0)) &amp; &quot;% LIFE&quot;</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="4740094943372483" type="MouseSprite">
+                            <param id="0" name="Instance variable">mangle</param>
+                            <param id="1" name="Value">angle(Player.X, Player.Y, Mouse.X(&quot;Game&quot;), Mouse.Y(&quot;Game&quot;))</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="505612546838106" type="MouseSprite">
+                            <param id="0" name="Instance variable">mdistance</param>
+                            <param id="1" name="Value">clamp(distance(Player.X, Player.Y, Mouse.X(&quot;Game&quot;), Mouse.Y(&quot;Game&quot;)), 110, 600)</param>
+                        </action>
+                        <action id="-3" name="Set position" sid="3694428996945362" type="MouseSprite">
+                            <param id="0" name="X">Player.X + cos(MouseSprite.mangle) * MouseSprite.mdistance</param>
+                            <param id="1" name="Y">Player.Y + sin(MouseSprite.mangle) * MouseSprite.mdistance</param>
+                        </action>
+                        <action id="-7" name="Scroll to position" sid="9056290234110979" type="System">
+                            <param id="0" name="X">(Player.X + MouseSprite.X) / 2</param>
+                            <param id="1" name="Y">(Player.Y + MouseSprite.Y) / 2</param>
+                        </action>
+                        <action id="-8" name="Set angle" sid="2807767299696341" type="Player">
+                            <param id="0" name="Angle">MouseSprite.mangle</param>
+                        </action>
+                        <action id="-17" name="Set layer scale" sid="350267331411896" type="System">
+                            <param id="0" name="Layer">&quot;Game&quot;</param>
+                            <param id="1" name="Scale">1.4 - MouseSprite.mdistance / 1200</param>
+                        </action>
+                        <action id="-17" name="Set layer scale" sid="8021873994333946" type="System">
+                            <param id="0" name="Layer">&quot;CloudShadows&quot;</param>
+                            <param id="1" name="Scale">LayerScale(&quot;Game&quot;)</param>
+                        </action>
+                        <action id="-17" name="Set layer scale" sid="5986463296042855" type="System">
+                            <param id="0" name="Layer">&quot;TorchLight&quot;</param>
+                            <param id="1" name="Scale">LayerScale(&quot;Game&quot;)</param>
+                        </action>
+                        <action id="-17" name="Set layer scale" sid="8061803529837673" type="System">
+                            <param id="0" name="Layer">&quot;RainDrops&quot;</param>
+                            <param id="1" name="Scale">LayerScale(&quot;Game&quot;)</param>
+                        </action>
+                        <action id="-17" name="Set layer scale" sid="6993700229451991" type="System">
+                            <param id="0" name="Layer">&quot;Monsters&quot;</param>
+                            <param id="1" name="Scale">LayerScale(&quot;Game&quot;)</param>
+                        </action>
+                        <action id="-17" name="Set layer scale" sid="8200947797287331" type="System">
+                            <param id="0" name="Layer">&quot;RainSplashes&quot;</param>
+                            <param id="1" name="Scale">LayerScale(&quot;Game&quot;)</param>
+                        </action>
+                        <action id="-17" name="Set layer scale" sid="8699566959284901" type="System">
+                            <param id="0" name="Layer">&quot;Bumpmap&quot;</param>
+                            <param id="1" name="Scale">LayerScale(&quot;Game&quot;)</param>
+                        </action>
+                        <action id="-17" name="Set layer scale" sid="4970648757787243" type="System">
+                            <param id="0" name="Layer">&quot;Background2&quot;</param>
+                            <param id="1" name="Scale">LayerScale(&quot;Game&quot;)</param>
+                        </action>
+                        <action id="-17" name="Set layer scale" sid="7707946321688324" type="System">
+                            <param id="0" name="Layer">&quot;Reflections&quot;</param>
+                            <param id="1" name="Scale">LayerScale(&quot;Game&quot;)</param>
+                        </action>
+                        <action id="-17" name="Set layer scale" sid="2352449500813791" type="System">
+                            <param id="0" name="Layer">&quot;Sky&quot;</param>
+                            <param id="1" name="Scale">LayerScale(&quot;Game&quot;)</param>
+                        </action>
+                        <action id="-17" name="Set layer scale" sid="5376868208449814" type="System">
+                            <param id="0" name="Layer">&quot;Background1&quot;</param>
+                            <param id="1" name="Scale">LayerScale(&quot;Game&quot;)</param>
+                        </action>
+                        <action id="-4" name="Set position to another object" sid="511722437936276" type="Laser">
+                            <param id="0" name="Object">PlayerGun</param>
+                            <param id="1" name="Image point (optional)">1</param>
+                        </action>
+                        <action id="-8" name="Set angle" sid="8332108177191534" type="Laser">
+                            <param id="0" name="Angle">angle(Self.X, Self.Y, MouseSprite.X, MouseSprite.Y)</param>
+                        </action>
+                        <action id="-5" name="Set width" sid="7927203489683921" type="Laser">
+                            <param id="0" name="Width">distance(Self.X, Self.Y, MouseSprite.X, MouseSprite.Y)</param>
+                        </action>
+                        <action id="-4" name="Set position to another object" sid="2727442252429439" type="LaserImpact">
+                            <param id="0" name="Object">MouseSprite</param>
+                            <param id="1" name="Image point (optional)">0</param>
+                        </action>
+                        <action id="-15" name="Set visible" sid="981535120575487" type="LaserImpact">
+                            <param id="0" name="Visibility">0</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="Shooting the player laser." sid="4930231546530455" title="Player control">
+            <sub-events>
+                <comment>Use WASD as alternate controls in addition to arrow keys.</comment>
+                <event-block sid="6275076543512498">
+                    <conditions>
+                        <condition id="2" name="Key is down" sid="9194480915659952" type="Keyboard">
+                            <param id="0" name="Key">87 (W)</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action behavior="8Direction" id="7" name="Simulate control" sid="1154100708167771" type="Player">
+                            <param id="0" name="Control">2</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="4342098359423904">
+                    <conditions>
+                        <condition id="2" name="Key is down" sid="2462517472192245" type="Keyboard">
+                            <param id="0" name="Key">65 (A)</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action behavior="8Direction" id="7" name="Simulate control" sid="1773038262669351" type="Player">
+                            <param id="0" name="Control">0</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="4007953232934706">
+                    <conditions>
+                        <condition id="2" name="Key is down" sid="294150776916275" type="Keyboard">
+                            <param id="0" name="Key">83 (S)</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action behavior="8Direction" id="7" name="Simulate control" sid="4511451401501506" type="Player">
+                            <param id="0" name="Control">3</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="799268029887002">
+                    <conditions>
+                        <condition id="2" name="Key is down" sid="9426940232888171" type="Keyboard">
+                            <param id="0" name="Key">68 (D)</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action behavior="8Direction" id="7" name="Simulate control" sid="8781242176704237" type="Player">
+                            <param id="0" name="Control">1</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>Shoot the laser if reloaded.  &apos;shooting&apos; lasts for 0.5 seconds, and after 2 seconds the player reloads.</comment>
+                <event-block sid="6575272072339573">
+                    <conditions>
+                        <condition id="2" name="Mouse button is down" sid="7898236666072143" type="Mouse">
+                            <param id="0" name="Mouse button">0</param>
+                        </condition>
+                        <condition id="-8" name="Is boolean instance variable set" sid="6587711095518775" type="Player">
+                            <param id="0" name="Instance variable">reloaded</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="0" name="Play" sid="8859372119540386" type="Audio">
+                            <param id="0" name="Audio file">laser</param>
+                            <param id="2" name="Loop">0</param>
+                            <param id="3" name="Volume">0</param>
+                            <param id="1" name="Tag (optional)">&quot;&quot;</param>
+                        </action>
+                        <action id="-13" name="Set boolean" sid="2136793024448419" type="Player">
+                            <param id="0" name="Instance variable">shooting</param>
+                            <param id="1" name="Value">1</param>
+                        </action>
+                        <action id="-13" name="Set boolean" sid="3061871184174213" type="Player">
+                            <param id="0" name="Instance variable">reloaded</param>
+                            <param id="1" name="Value">0</param>
+                        </action>
+                        <action id="-16" name="Wait" sid="224372710870875" type="System">
+                            <param id="0" name="Seconds">0.5</param>
+                        </action>
+                        <action id="-13" name="Set boolean" sid="7855947337710137" type="Player">
+                            <param id="0" name="Instance variable">shooting</param>
+                            <param id="1" name="Value">0</param>
+                        </action>
+                        <action id="-16" name="Wait" sid="1512449179280513" type="System">
+                            <param id="0" name="Seconds">1.5</param>
+                        </action>
+                        <action id="-13" name="Set boolean" sid="1939044866410289" type="Player">
+                            <param id="0" name="Instance variable">reloaded</param>
+                            <param id="1" name="Value">1</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>While shooting, show the laser impact and leave a trail of LaserGlow sprites.</comment>
+                <event-block sid="12432482583846">
+                    <conditions>
+                        <condition id="-8" name="Is boolean instance variable set" sid="6371180105218268" type="Player">
+                            <param id="0" name="Instance variable">shooting</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-16" name="Set opacity" sid="5661098227913771" type="Laser">
+                            <param id="0" name="Opacity">100</param>
+                        </action>
+                        <action id="-15" name="Set visible" sid="3416331498380672" type="LaserImpact">
+                            <param id="0" name="Visibility">1</param>
+                        </action>
+                        <action id="-8" name="Set angle" sid="3455978312627351" type="LaserImpact">
+                            <param id="0" name="Angle">random(360)</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="7862732835107056">
+                            <conditions>
+                                <condition id="-6" name="Every X seconds" sid="8861795892853661" type="System">
+                                    <param id="0" name="Interval (seconds)">0.05</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Spawn another object" sid="5934043608120021" type="MouseSprite">
+                                    <param id="0" name="Object">LaserGlow</param>
+                                    <param id="1" name="Layer">&quot;Game&quot;</param>
+                                    <param id="2" name="Image point">0</param>
+                                </action>
+                                <action id="-3" name="Set position" sid="8345510375198393" type="LaserGlow">
+                                    <param id="0" name="X">Self.X + random(-6, 6)</param>
+                                    <param id="1" name="Y">Self.Y + random(-6, 6)</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <comment>If effects are supported (WebGL renderer), show a trail of splashes if the laser is over a puddle.</comment>
+                        <event-block sid="3460270756565395">
+                            <conditions>
+                                <condition id="-27" name="Effects are supported" sid="2961652889323878" type="System" />
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Spawn another object" sid="6225516732908777" type="MouseSprite">
+                                    <param id="0" name="Object">Splash</param>
+                                    <param id="1" name="Layer">&quot;RainSplashes&quot;</param>
+                                    <param id="2" name="Image point">0</param>
+                                </action>
+                                <action id="-10" name="Set value" sid="8085954279131691" type="Splash">
+                                    <param id="0" name="Instance variable">size</param>
+                                    <param id="1" name="Value">random(50, 100)</param>
+                                </action>
+                                <action id="-7" name="Set size" sid="8526196889082664" type="Splash">
+                                    <param id="0" name="Width">1</param>
+                                    <param id="1" name="Height">1</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="5884150083017526">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="3057738045888595" type="System" />
+                        <condition id="-8" name="Is boolean instance variable set" sid="3462866570265092" type="Player">
+                            <param id="0" name="Instance variable">reloaded</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-16" name="Set opacity" sid="4802432651517906" type="Laser">
+                            <param id="0" name="Opacity">40</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="5301793521936203">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="2667890762521481" type="System" />
+                    </conditions>
+                    <actions>
+                        <action id="-16" name="Set opacity" sid="245383951173368" type="Laser">
+                            <param id="0" name="Opacity">10</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>Play the player walking sound effects.  Change to splash sounds if over a puddle.</comment>
+                <event-block sid="5041582001096912">
+                    <conditions>
+                        <condition behavior="8Direction" id="1" name="Compare speed" sid="1432769481218365" type="Player">
+                            <param id="0" name="Comparison">5</param>
+                            <param id="1" name="Speed">100</param>
+                        </condition>
+                        <condition id="-6" name="Every X seconds" sid="177375313452446" type="System">
+                            <param id="0" name="Interval (seconds)">0.333</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <event-block sid="9545510887810679">
+                            <conditions />
+                            <actions>
+                                <action id="7" name="Play (by name)" sid="6665010452490791" type="Audio">
+                                    <param id="0" name="Folder">0</param>
+                                    <param id="1" name="Audio file name">choose(&quot;splash1&quot;, &quot;splash2&quot;, &quot;splash3&quot;, &quot;splash4&quot;)</param>
+                                    <param id="3" name="Loop">0</param>
+                                    <param id="4" name="Volume">-10</param>
+                                    <param id="2" name="Tag (optional)">&quot;step&quot;</param>
+                                </action>
+                                <action id="3" name="Set volume" sid="9766305571282638" type="Audio">
+                                    <param id="0" name="Tag">&quot;step&quot;</param>
+                                    <param id="1" name="dB">-10</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <comment>Also create a splash if walking through a puddle and effects are supported.</comment>
+                                <event-block sid="1874287574685618">
+                                    <conditions>
+                                        <condition id="-27" name="Effects are supported" sid="2156856471728537" type="System" />
+                                    </conditions>
+                                    <actions>
+                                        <action id="0" name="Spawn another object" sid="3963718656501196" type="Player">
+                                            <param id="0" name="Object">Splash</param>
+                                            <param id="1" name="Layer">&quot;RainSplashes&quot;</param>
+                                            <param id="2" name="Image point">0</param>
+                                        </action>
+                                        <action id="-10" name="Set value" sid="3040557292369967" type="Splash">
+                                            <param id="0" name="Instance variable">size</param>
+                                            <param id="1" name="Value">random(80, 100)</param>
+                                        </action>
+                                        <action id="-10" name="Set value" sid="7382704454354401" type="Splash">
+                                            <param id="0" name="Instance variable">startsize</param>
+                                            <param id="1" name="Value">60</param>
+                                        </action>
+                                        <action id="-7" name="Set size" sid="9844135180625508" type="Splash">
+                                            <param id="0" name="Width">60</param>
+                                            <param id="1" name="Height">60</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                        <event-block sid="4297285084764344">
+                            <conditions>
+                                <condition id="-22" name="Else" sid="5866630692000041" type="System" />
+                            </conditions>
+                            <actions>
+                                <action id="7" name="Play (by name)" sid="1262061836462511" type="Audio">
+                                    <param id="0" name="Folder">0</param>
+                                    <param id="1" name="Audio file name">choose(&quot;step1&quot;, &quot;step2&quot;, &quot;step3&quot;, &quot;step4&quot;)</param>
+                                    <param id="3" name="Loop">0</param>
+                                    <param id="4" name="Volume">-10</param>
+                                    <param id="2" name="Tag (optional)">&quot;step&quot;</param>
+                                </action>
+                                <action id="3" name="Set volume" sid="7697258559021774" type="Audio">
+                                    <param id="0" name="Tag">&quot;step&quot;</param>
+                                    <param id="1" name="dB">-10</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="Moving and controlling the monsters." sid="4454581980745349" title="Monster control">
+            <sub-events>
+                <comment>If a monster leaves the layout, point them roughly in the direction of the player.</comment>
+                <event-block sid="589526781920683">
+                    <conditions>
+                        <condition id="-4" name="Is outside layout" sid="412440793673415" type="Monster" />
+                    </conditions>
+                    <actions>
+                        <action id="-22" name="Set angle toward position" sid="6783621740334011" type="Monster">
+                            <param id="0" name="X">Player.X</param>
+                            <param id="1" name="Y">Player.Y</param>
+                        </action>
+                        <action id="-18" name="Rotate clockwise" sid="7218772272737265" type="Monster">
+                            <param id="0" name="Degrees">random(-30, 30)</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>Keep the monster opacity updated based on its health.</comment>
+                <event-block sid="5861304948440514">
+                    <conditions>
+                        <condition id="-1" name="Every tick" sid="8670092236055336" type="System" />
+                    </conditions>
+                    <actions>
+                        <action id="-16" name="Set opacity" sid="6312623722002192" type="Monster">
+                            <param id="0" name="Opacity">Self.health * 0.7 + 30</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>Hurt monsters while they are being shot.</comment>
+                <event-block sid="9563863764172284">
+                    <conditions>
+                        <condition id="-8" name="Is boolean instance variable set" sid="7432194896454242" type="Player">
+                            <param id="0" name="Instance variable">shooting</param>
+                        </condition>
+                        <condition id="1" name="Is overlapping another object" sid="2653690467421857" type="MouseSprite">
+                            <param id="0" name="Object">Monster</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-12" name="Subtract from" sid="1786633383156887" type="Monster">
+                            <param id="0" name="Instance variable">health</param>
+                            <param id="1" name="Value">266 * dt</param>
+                        </action>
+                        <action id="-18" name="Rotate clockwise" sid="6636125093024364" type="Monster">
+                            <param id="0" name="Degrees">random(-15, 15)</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>If a monster is killed, destroy it and create 2 more monsters off-screen to replace it.</comment>
+                <event-block sid="9654696152216348">
+                    <conditions>
+                        <condition id="-7" name="Compare instance variable" sid="4064904731886253" type="Monster">
+                            <param id="0" name="Instance variable">health</param>
+                            <param id="1" name="Comparison">3</param>
+                            <param id="2" name="Value">0</param>
+                        </condition>
+                        <condition id="-11" name="For Each" sid="6498008589160594" type="System">
+                            <param id="0" name="Object">Monster</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-9" name="Destroy" sid="963130667995886" type="Monster" />
+                        <action id="0" name="Play" sid="675461953061775" type="Audio">
+                            <param id="0" name="Audio file">fireball</param>
+                            <param id="2" name="Loop">0</param>
+                            <param id="3" name="Volume">0</param>
+                            <param id="1" name="Tag (optional)">&quot;&quot;</param>
+                        </action>
+                        <action id="-10" name="Add to" sid="9414524614512268" type="System">
+                            <param id="0" name="Variable">kills</param>
+                            <param id="1" name="Value">1</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="8689714775895651">
+                            <conditions>
+                                <condition id="-12" name="Repeat" sid="6353158697522271" type="System">
+                                    <param id="0" name="Count">2</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="-3" name="Create object" sid="5312768442049578" type="System">
+                                    <param id="0" name="Object to create">Monster</param>
+                                    <param id="1" name="Layer">&quot;Monsters&quot;</param>
+                                    <param id="2" name="X">random(LayoutWidth)</param>
+                                    <param id="3" name="Y">random(LayoutHeight)</param>
+                                </action>
+                            </actions>
+                            <sub-events>
+                                <comment>Randomly reposition the new monster until it is not on-screen. We don&apos;t want monsters suddenly appearing next to the player.</comment>
+                                <event-block sid="1348280601795039">
+                                    <conditions>
+                                        <condition id="-23" name="While" sid="6714609231113995" type="System" />
+                                        <condition id="-3" name="Is on-screen" sid="6254187080479892" type="Monster" />
+                                    </conditions>
+                                    <actions>
+                                        <action id="-3" name="Set position" sid="5220985736886503" type="Monster">
+                                            <param id="0" name="X">random(LayoutWidth)</param>
+                                            <param id="1" name="Y">random(LayoutHeight)</param>
+                                        </action>
+                                    </actions>
+                                </event-block>
+                            </sub-events>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <comment>If a monster is near the player, rotate it so it chases them.</comment>
+                <event-block sid="8239678053599494">
+                    <conditions>
+                        <condition id="-11" name="For Each" sid="7389780528300913" type="System">
+                            <param id="0" name="Object">Monster</param>
+                        </condition>
+                        <condition id="-8" name="Compare two values" sid="1242839937157929" type="System">
+                            <param id="0" name="First value">distance(Monster.X, Monster.Y, Player.X, Player.Y)</param>
+                            <param id="1" name="Comparison">2</param>
+                            <param id="2" name="Second value">300</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-21" name="Rotate toward position" sid="2559038042715311" type="Monster">
+                            <param id="0" name="Degrees">(300 - distance(Monster.X, Monster.Y, Player.X, Player.Y)) * dt</param>
+                            <param id="1" name="X">Player.X</param>
+                            <param id="2" name="Y">Player.Y</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>If the player is touching a monster, increase the &apos;hurting&apos; variable which then reduces their health and shows the hurt effects.</comment>
+                <event-block sid="7951251801480516">
+                    <conditions>
+                        <condition id="1" name="Is overlapping another object" sid="2501120473246299" type="Player">
+                            <param id="0" name="Object">Monster</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-10" name="Set value" sid="3486597556958054" type="Player">
+                            <param id="0" name="Instance variable">hurting</param>
+                            <param id="1" name="Value">min(Self.hurting + 300 * dt, 100)</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="5415190578672838">
+                            <conditions>
+                                <condition id="-6" name="Every X seconds" sid="9902648690783319" type="System">
+                                    <param id="0" name="Interval (seconds)">1.3</param>
+                                </condition>
+                                <condition id="-14" name="Compare variable" sid="7751289091289694" type="System">
+                                    <param id="0" name="Variable">health</param>
+                                    <param id="1" name="Comparison">4</param>
+                                    <param id="2" name="Value">0</param>
+                                </condition>
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Play" sid="4836998581166444" type="Audio">
+                                    <param id="0" name="Audio file">SFX4</param>
+                                    <param id="2" name="Loop">0</param>
+                                    <param id="3" name="Volume">0</param>
+                                    <param id="1" name="Tag (optional)">&quot;sfx4&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="4769239541784712">
+                    <conditions>
+                        <condition id="1" inverted="1" name="Is overlapping another object" sid="5776443058468019" type="Player">
+                            <param id="0" name="Object">Monster</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-10" name="Set value" sid="4417395455195946" type="Player">
+                            <param id="0" name="Instance variable">hurting</param>
+                            <param id="1" name="Value">max(Self.hurting - 100 * dt, 0)</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="6816002910344107">
+                    <conditions>
+                        <condition id="-1" name="Every tick" sid="8136448019257823" type="System" />
+                    </conditions>
+                    <actions>
+                        <action id="3" name="Set volume" sid="9155072858040845" type="Audio">
+                            <param id="0" name="Tag">&quot;sfx4&quot;</param>
+                            <param id="1" name="dB">lerp(-40, -10, player.hurting / 100)</param>
+                        </action>
+                        <action id="-31" name="Set layout effect parameter" sid="7215063377012116" type="System">
+                            <param id="0" name="Effect">&quot;RadialBlur&quot;</param>
+                            <param id="1" name="Parameter index">0</param>
+                            <param id="2" name="Value">(Player.Sine.Value + 60) * (Player.hurting / 100)</param>
+                        </action>
+                        <action id="-31" name="Set layout effect parameter" sid="1012459315785903" type="System">
+                            <param id="0" name="Effect">&quot;Tint&quot;</param>
+                            <param id="1" name="Parameter index">1</param>
+                            <param id="2" name="Value">100 - (Player.hurting / 200) * (100 - (LayerOpacity(&quot;TransitionOut&quot;)))</param>
+                        </action>
+                        <action id="-31" name="Set layout effect parameter" sid="6871614656099572" type="System">
+                            <param id="0" name="Effect">&quot;Tint&quot;</param>
+                            <param id="1" name="Parameter index">2</param>
+                            <param id="2" name="Value">100 - (Player.hurting / 200) * (100 - (LayerOpacity(&quot;TransitionOut&quot;)))</param>
+                        </action>
+                        <action id="-11" name="Subtract from" sid="8244481504581781" type="System">
+                            <param id="0" name="Variable">health</param>
+                            <param id="1" name="Value">(Player.hurting / 5) * dt</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>Show hurting layout effects (radial blur and tint) if the player is being hurt by a monster.</comment>
+                <event-block sid="3013377583844599">
+                    <conditions>
+                        <condition id="-7" name="Compare instance variable" sid="2537248609806315" type="Player">
+                            <param id="0" name="Instance variable">hurting</param>
+                            <param id="1" name="Comparison">3</param>
+                            <param id="2" name="Value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-29" name="Set layout effect enabled" sid="9847845908436448" type="System">
+                            <param id="0" name="Mode">0</param>
+                            <param id="1" name="Effect">&quot;RadialBlur&quot;</param>
+                        </action>
+                        <action id="-29" name="Set layout effect enabled" sid="4330407583920733" type="System">
+                            <param id="0" name="Mode">0</param>
+                            <param id="1" name="Effect">&quot;Tint&quot;</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="3859936320922025">
+                    <conditions>
+                        <condition id="-22" name="Else" sid="144271645334304" type="System" />
+                    </conditions>
+                    <actions>
+                        <action id="-29" name="Set layout effect enabled" sid="720677754959048" type="System">
+                            <param id="0" name="Mode">1</param>
+                            <param id="1" name="Effect">&quot;RadialBlur&quot;</param>
+                        </action>
+                        <action id="-29" name="Set layout effect enabled" sid="7291987044961161" type="System">
+                            <param id="0" name="Mode">1</param>
+                            <param id="1" name="Effect">&quot;Tint&quot;</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>If the player dies, use the swirl layout effect to create a finish transition.</comment>
+                <event-block sid="1639480338762146">
+                    <conditions>
+                        <condition id="-14" name="Compare variable" sid="4284154961678201" type="System">
+                            <param id="0" name="Variable">health</param>
+                            <param id="1" name="Comparison">3</param>
+                            <param id="2" name="Value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-29" name="Set layout effect enabled" sid="7932857659022124" type="System">
+                            <param id="0" name="Mode">1</param>
+                            <param id="1" name="Effect">&quot;Swirl&quot;</param>
+                        </action>
+                        <action id="-10" name="Add to" sid="7597447886399691" type="System">
+                            <param id="0" name="Variable">swirlangle</param>
+                            <param id="1" name="Value">50 * dt + (swirlangle * dt / 5)</param>
+                        </action>
+                        <action id="-31" name="Set layout effect parameter" sid="581409705288386" type="System">
+                            <param id="0" name="Effect">&quot;Swirl&quot;</param>
+                            <param id="1" name="Parameter index">1</param>
+                            <param id="2" name="Value">swirlangle</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="1985093109935695">
+                            <conditions>
+                                <condition id="-4" name="Trigger once while true" sid="6148946049213514" type="System" />
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Play" sid="9257155304689885" type="Audio">
+                                    <param id="0" name="Audio file">Swoosh2</param>
+                                    <param id="2" name="Loop">0</param>
+                                    <param id="3" name="Volume">0</param>
+                                    <param id="1" name="Tag (optional)">&quot;&quot;</param>
+                                </action>
+                                <action id="-16" name="Wait" sid="5212718528837579" type="System">
+                                    <param id="0" name="Seconds">3</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="4293983974770705" type="System">
+                                    <param id="0" name="Variable">fadingout</param>
+                                    <param id="1" name="Value">1</param>
+                                </action>
+                                <action id="-16" name="Wait" sid="3240665910402944" type="System">
+                                    <param id="0" name="Seconds">3</param>
+                                </action>
+                                <action id="6" name="Stop" sid="8290443990779364" type="Audio">
+                                    <param id="0" name="Tag">&quot;rain&quot;</param>
+                                </action>
+                                <action id="-21" name="Reset global variables" sid="7414059962057557" type="System" />
+                                <action id="-2" name="Go to layout" sid="8516292134932832" type="System">
+                                    <param id="0" name="Layout">Title</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+                <event-block sid="8083400209717769">
+                    <conditions>
+                        <condition id="-14" name="Compare variable" sid="2014912067715246" type="System">
+                            <param id="0" name="Variable">fadingout</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Value">1</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-4" name="Set layer visible" sid="1048631750529461" type="System">
+                            <param id="0" name="Layer">&quot;TransitionOut&quot;</param>
+                            <param id="1" name="Visibility">1</param>
+                        </action>
+                        <action id="-18" name="Set layer opacity" sid="9108166942875224" type="System">
+                            <param id="0" name="Layer">&quot;TransitionOut&quot;</param>
+                            <param id="1" name="Opacity">LayerOpacity(&quot;TransitionOut&quot;) + dt * 35</param>
+                        </action>
+                        <action id="-16" name="Set opacity" sid="6837882530088071" type="HealthText">
+                            <param id="0" name="Opacity">50 - LayerOpacity(&quot;TransitionOut&quot;) / 2</param>
+                        </action>
+                        <action id="-16" name="Set opacity" sid="8519708378225345" type="KillsText">
+                            <param id="0" name="Opacity">50 - LayerOpacity(&quot;TransitionOut&quot;) / 2</param>
+                        </action>
+                        <action id="3" name="Set volume" sid="3165465223179792" type="Audio">
+                            <param id="0" name="Tag">&quot;rain&quot;</param>
+                            <param id="1" name="dB">lerp(-5, -30, LayerOpacity(&quot;TransitionOut&quot;) / 100)</param>
+                        </action>
+                    </actions>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="Run the raindrop effect and create the splashes on puddles." sid="2151987392205574" title="Raindrops">
+            <sub-events>
+                <comment>Create 200 raindrop objects on startup.</comment>
+                <event-block sid="282992463211678">
+                    <conditions>
+                        <condition id="-2" name="On start of layout" sid="1932189939225506" type="System" />
+                        <condition id="-12" name="Repeat" sid="1765782520793675" type="System">
+                            <param id="0" name="Count">200</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-3" name="Create object" sid="3175683912184939" type="System">
+                            <param id="0" name="Object to create">Raindrop</param>
+                            <param id="1" name="Layer">&quot;RainDrops&quot;</param>
+                            <param id="2" name="X">0</param>
+                            <param id="3" name="Y">0</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="2879220069842954" type="Raindrop">
+                            <param id="0" name="Instance variable">rx</param>
+                            <param id="1" name="Value">random(windowwidth)</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="5109549534395854" type="Raindrop">
+                            <param id="0" name="Instance variable">ry</param>
+                            <param id="1" name="Value">random(windowheight)</param>
+                        </action>
+                        <action id="-10" name="Set value" sid="6286850590878627" type="Raindrop">
+                            <param id="0" name="Instance variable">rh</param>
+                            <param id="1" name="Value">random(5, 105)</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>Keep the raindrop and splash positions and sizes up-to-date.</comment>
+                <event-block sid="5057946932657028">
+                    <conditions>
+                        <condition id="-1" name="Every tick" sid="6624787895410306" type="System" />
+                    </conditions>
+                    <actions>
+                        <action id="-1" name="Set X" sid="753226274076953" type="Raindrop">
+                            <param id="0" name="X">ScrollX + (Self.rx - ScrollX) * (1.0 + Self.rh / 100.0)</param>
+                        </action>
+                        <action id="-2" name="Set Y" sid="2424176539072952" type="Raindrop">
+                            <param id="0" name="Y">ScrollY + (Self.ry - ScrollY) * (1.0 + Self.rh / 100.0)</param>
+                        </action>
+                        <action id="-22" name="Set angle toward position" sid="8646139044968853" type="Raindrop">
+                            <param id="0" name="X">ScrollX</param>
+                            <param id="1" name="Y">ScrollY</param>
+                        </action>
+                        <action id="-5" name="Set width" sid="5855961660834937" type="Raindrop">
+                            <param id="0" name="Width">distance(Self.X, Self.Y, ScrollX, ScrollY) * Self.rh / 333.0 + 5.0</param>
+                        </action>
+                        <action id="-12" name="Subtract from" sid="4806019899424822" type="Raindrop">
+                            <param id="0" name="Instance variable">rh</param>
+                            <param id="1" name="Value">250.0 * dt</param>
+                        </action>
+                        <action id="-16" name="Set opacity" sid="3999049801262979" type="Raindrop">
+                            <param id="0" name="Opacity">(100.0 - Self.rh) / 3.0</param>
+                        </action>
+                        <action id="-11" name="Add to" sid="9678388430850672" type="Splash">
+                            <param id="0" name="Instance variable">mytime</param>
+                            <param id="1" name="Value">dt</param>
+                        </action>
+                        <action id="-7" name="Set size" sid="7150952123199735" type="Splash">
+                            <param id="0" name="Width">lerp(Self.startsize, Self.size, Self.mytime * 2)</param>
+                            <param id="1" name="Height">lerp(Self.startsize, Self.size, Self.mytime * 2)</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <comment>Raindrop has fallen to floor?</comment>
+                <event-block sid="6189649302045325">
+                    <conditions>
+                        <condition id="-7" name="Compare instance variable" sid="5376359729532931" type="Raindrop">
+                            <param id="0" name="Instance variable">rh</param>
+                            <param id="1" name="Comparison">2</param>
+                            <param id="2" name="Value">0</param>
+                        </condition>
+                    </conditions>
+                    <actions />
+                    <sub-events>
+                        <comment>If overlapping a puddle, create a splash.  Don&apos;t bother doing this if WebGL is not supported, since the whole layer will be invisible.</comment>
+                        <event-block sid="7498546356217699">
+                            <conditions>
+                                <condition id="-27" name="Effects are supported" sid="5456481182134965" type="System" />
+                            </conditions>
+                            <actions>
+                                <action id="0" name="Spawn another object" sid="7387900985032387" type="Raindrop">
+                                    <param id="0" name="Object">Splash</param>
+                                    <param id="1" name="Layer">&quot;RainSplashes&quot;</param>
+                                    <param id="2" name="Image point">1</param>
+                                </action>
+                                <action id="-10" name="Set value" sid="1448604561282136" type="Splash">
+                                    <param id="0" name="Instance variable">size</param>
+                                    <param id="1" name="Value">random(14, 40)</param>
+                                </action>
+                                <action id="-7" name="Set size" sid="6306809180838464" type="Splash">
+                                    <param id="0" name="Width">1</param>
+                                    <param id="1" name="Height">1</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                        <comment>Reset the raindrop to fall from the top again.</comment>
+                        <event-block sid="2492911644128965">
+                            <conditions>
+                                <condition id="-1" name="Every tick" sid="4574613207378559" type="System" />
+                            </conditions>
+                            <actions>
+                                <action id="-10" name="Set value" sid="551755788148184" type="Raindrop">
+                                    <param id="0" name="Instance variable">rx</param>
+                                    <param id="1" name="Value">random(ViewportLeft(&quot;RainDrops&quot;), ViewportRight(&quot;RainDrops&quot;))</param>
+                                </action>
+                                <action id="-10" name="Set value" sid="9194037283484124" type="Raindrop">
+                                    <param id="0" name="Instance variable">ry</param>
+                                    <param id="1" name="Value">random(ViewportTop(&quot;RainDrops&quot;), ViewportBottom(&quot;RainDrops&quot;))</param>
+                                </action>
+                                <action id="-10" name="Set value" sid="7290115409522908" type="Raindrop">
+                                    <param id="0" name="Instance variable">rh</param>
+                                    <param id="1" name="Value">random(95, 105)</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-group>
+        <event-group description="Make the screen flash and play thunder sounds." sid="8346520708554923" title="Lightning">
+            <sub-events>
+                <comment>Every 5 to 15 seconds, flash the &apos;Lightning&apos; layer visible and randomise its opacity for 100-200ms.  The layer uses a light blue color with a Dodge effect to create a more realistic looking flash effect.  Play a random thunder sound effect 2 to 6 seconds after the flash, to simulate the delay caused by the speed of sound after the flash.</comment>
+                <event-block sid="484995419402724">
+                    <conditions>
+                        <condition id="-14" name="Compare variable" sid="4421988189628116" type="System">
+                            <param id="0" name="Variable">isLightning</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Value">0</param>
+                        </condition>
+                        <condition id="-4" name="Trigger once while true" sid="1137992398097709" type="System" />
+                    </conditions>
+                    <actions>
+                        <action id="-4" name="Set layer visible" sid="7735436209556971" type="System">
+                            <param id="0" name="Layer">&quot;Lightning&quot;</param>
+                            <param id="1" name="Visibility">0</param>
+                        </action>
+                        <action id="-4" name="Set layer visible" sid="5171074441050444" type="System">
+                            <param id="0" name="Layer">&quot;TorchLight&quot;</param>
+                            <param id="1" name="Visibility">1</param>
+                        </action>
+                        <action id="-18" name="Set layer opacity" sid="9142759529296458" type="System">
+                            <param id="0" name="Layer">&quot;Sky&quot;</param>
+                            <param id="1" name="Opacity">33</param>
+                        </action>
+                        <action id="-16" name="Wait" sid="8614445265469333" type="System">
+                            <param id="0" name="Seconds">random(5, 15)</param>
+                        </action>
+                        <action id="-9" name="Set value" sid="4903670415405697" type="System">
+                            <param id="0" name="Variable">isLightning</param>
+                            <param id="1" name="Value">1</param>
+                        </action>
+                    </actions>
+                </event-block>
+                <event-block sid="9923522721224798">
+                    <conditions>
+                        <condition id="-14" name="Compare variable" sid="6813293966222289" type="System">
+                            <param id="0" name="Variable">isLightning</param>
+                            <param id="1" name="Comparison">0</param>
+                            <param id="2" name="Value">1</param>
+                        </condition>
+                    </conditions>
+                    <actions>
+                        <action id="-18" name="Set layer opacity" sid="1418568388880831" type="System">
+                            <param id="0" name="Layer">&quot;Lightning&quot;</param>
+                            <param id="1" name="Opacity">50 + random(30)</param>
+                        </action>
+                        <action id="-18" name="Set layer opacity" sid="8058432758732034" type="System">
+                            <param id="0" name="Layer">&quot;Sky&quot;</param>
+                            <param id="1" name="Opacity">33 + random(33)</param>
+                        </action>
+                    </actions>
+                    <sub-events>
+                        <event-block sid="6130387007278104">
+                            <conditions>
+                                <condition id="-4" name="Trigger once while true" sid="6252822397186777" type="System" />
+                            </conditions>
+                            <actions>
+                                <action id="-4" name="Set layer visible" sid="544934082739813" type="System">
+                                    <param id="0" name="Layer">&quot;Lightning&quot;</param>
+                                    <param id="1" name="Visibility">1</param>
+                                </action>
+                                <action id="-4" name="Set layer visible" sid="2652443655778899" type="System">
+                                    <param id="0" name="Layer">&quot;TorchLight&quot;</param>
+                                    <param id="1" name="Visibility">0</param>
+                                </action>
+                                <action id="-16" name="Wait" sid="4640472264271898" type="System">
+                                    <param id="0" name="Seconds">random(0.1, 0.2)</param>
+                                </action>
+                                <action id="-9" name="Set value" sid="4634237456630946" type="System">
+                                    <param id="0" name="Variable">isLightning</param>
+                                    <param id="1" name="Value">0</param>
+                                </action>
+                                <action id="-16" name="Wait" sid="6333210629527724" type="System">
+                                    <param id="0" name="Seconds">random(2, 6)</param>
+                                </action>
+                                <action id="7" name="Play (by name)" sid="428181549841892" type="Audio">
+                                    <param id="0" name="Folder">0</param>
+                                    <param id="1" name="Audio file name">choose(&quot;thunder1&quot;, &quot;thunder2&quot;, &quot;thunder3&quot;, &quot;thunder4&quot;, &quot;thunder5&quot;)</param>
+                                    <param id="3" name="Loop">0</param>
+                                    <param id="4" name="Volume">-10</param>
+                                    <param id="2" name="Tag (optional)">&quot;&quot;</param>
+                                </action>
+                            </actions>
+                        </event-block>
+                    </sub-events>
+                </event-block>
+            </sub-events>
+        </event-group>
+    </events>
+</c2eventsheet>
